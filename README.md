@@ -49,7 +49,6 @@ Taskly/
 │   │   ├── TaskInput.jsx
 │   │   ├── TaskList.jsx
 │   │   ├── TaskItem.jsx
-│   ├── screens/
 │   │   ├── HomeScreen.jsx
 │   │   ├── StatsScreen.jsx
 │   ├── theme.js
