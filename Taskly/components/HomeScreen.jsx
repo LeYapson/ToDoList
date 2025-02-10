@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TaskList from './TaskList';
@@ -10,8 +10,8 @@ import { lightTheme, darkTheme } from './theme';
 export default function HomeScreen({ navigation }) {
   const [tasks, setTasks] = useState([]);
   const [theme, setTheme] = useState(lightTheme);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  // Charger le thème depuis AsyncStorage
   useEffect(() => {
     const loadTheme = async () => {
       const storedTheme = await AsyncStorage.getItem('theme');
@@ -30,11 +30,6 @@ export default function HomeScreen({ navigation }) {
     }
   }, [tasks]);
 
-  useEffect(() => {
-  }, [tasks]);
-  
-
-  // Basculer entre les thèmes et enregistrer le choix
   const toggleTheme = async () => {
     const newTheme = theme === lightTheme ? darkTheme : lightTheme;
     setTheme(newTheme);
@@ -44,8 +39,8 @@ export default function HomeScreen({ navigation }) {
   const addTask = (text, category) => {
     const newTasks = [...tasks, { id: Date.now().toString(), text, category, completed: false }];
     setTasks(newTasks);
+    setModalVisible(false);
   };
-  
 
   const toggleTask = (id) => {
     setTasks(tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task));
@@ -55,48 +50,118 @@ export default function HomeScreen({ navigation }) {
     setTasks(tasks.filter(task => task.id !== id));
   };
 
+  const categorizedTasks = tasks.reduce((acc, task) => {
+    if (!task.completed) {
+      if (!acc[task.category]) acc[task.category] = [];
+      acc[task.category].push(task);
+    }
+    return acc;
+  }, {});
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-    <View style={[styles.container, { backgroundColor: theme.background }]}>  
-      {/* HEADER AVEC TITRE ET BOUTON THÈME */}
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>  
       <View style={styles.header}>
         <Text style={[styles.title, { color: theme.text }]}>📋 To-Do List</Text>
         <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
-          <Text style={[styles.themeButtonText, { color: theme.text }]}>
-            {theme === lightTheme ? '🌙' : '☀️'}
-          </Text>
+          <Text style={[styles.themeButtonText, { color: theme.text }]}> {theme === lightTheme ? '🌙' : '☀️'} </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Bouton de navigation vers les statistiques */}
-      <TouchableOpacity style={styles.statsButton} onPress={() => navigation.navigate('Stats', { tasks, theme })}>
-  <Text style={styles.statsButtonText}>📊 Voir les Statistiques</Text>
-</TouchableOpacity>
-
-
-      <TaskInput addTask={addTask} theme={theme} />
-      {tasks.length > 0 ? (
-        <TaskList tasks={tasks} toggleTask={toggleTask} deleteTask={deleteTask} theme={theme} />
+      {tasks.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={[styles.emptyText, { color: theme.text }]}>Aucune tâche pour le moment.</Text>
+          <Text style={[styles.emptyText, { color: theme.text }]}>Ajoutez-en une avec le +</Text>
+        </View>
       ) : (
-        <Text style={[styles.emptyText, { color: theme.text }]}>Aucune tâche ajoutée. Ajoute ta première tâche ! 📌</Text>
+        <FlatList
+          data={Object.entries(categorizedTasks)}
+          keyExtractor={(item) => item[0]}
+          renderItem={({ item }) => (
+            <View>
+              <Text style={[styles.categoryTitle, { color: theme.text }]}>{item[0]}</Text>
+              <TaskList tasks={item[1]} toggleTask={toggleTask} deleteTask={deleteTask} theme={theme} />
+            </View>
+          )}
+        />
       )}
-    </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <TaskInput addTask={addTask} theme={theme} />
+          <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+            <Text style={styles.closeButtonText}>Fermer</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+        <Text style={styles.addButtonText}>+</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={styles.statsButton} onPress={() => navigation.navigate('Stats', { tasks, theme })}>
+        <Text style={styles.statsButtonText}>≡</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
     marginBottom: 10,
   },
   title: { fontSize: 24, fontWeight: 'bold' },
   themeButton: { padding: 10, borderRadius: 10, backgroundColor: '#666' },
   themeButtonText: { fontSize: 18, fontWeight: 'bold' },
-  emptyText: { fontSize: 16, textAlign: 'center', marginTop: 20 },
-  statsButton: { padding: 10, borderRadius: 10, backgroundColor: '#007AFF', alignItems: 'center', marginVertical: 10 },
-  statsButtonText: { fontSize: 16, fontWeight: 'bold', color: '#fff' },
+  categoryTitle: { fontSize: 20, fontWeight: 'bold', marginVertical: 10 },
+  emptyContainer: { justifyContent: 'center', alignItems: 'center' },
+  emptyText: { fontSize: 16, textAlign: 'center', marginTop: 10 },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#FF5733',
+    borderRadius: 5,
+  },
+  closeButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 60,
+    height: 60,
+    backgroundColor: '#007AFF',
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+  },
+  addButtonText: { fontSize: 30, color: '#fff' },
+  statsButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    width: 60,
+    height: 60,
+    backgroundColor: '#007AFF',
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+  },
+  statsButtonText: { fontSize: 30, color: '#fff' },
 });

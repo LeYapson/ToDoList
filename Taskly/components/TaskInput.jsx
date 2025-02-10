@@ -13,17 +13,22 @@ export default function TaskInput({ addTask, theme }) {
   };
 
   return (
-    <View>
-      <TextInput 
-  style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text }]} 
-  placeholderTextColor={theme.text}
-  value={task} 
-  onChangeText={setTask} 
-  placeholder="Nouvelle tâche..." 
-/>
+    <View style={[styles.container, { backgroundColor: theme.taskBackground }]}>  
+      <Text style={[styles.label, { color: theme.text }]}>Nouvelle tâche :</Text>
+      <TextInput
+        style={[styles.input, { color: theme.text }]}
+        placeholder="Entrez une tâche"
+        placeholderTextColor={theme.text}
+        value={task}
+        onChangeText={setTask}
+      />
 
-      
-      <Picker selectedValue={category} style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text }]}  onValueChange={(itemValue) => setCategory(itemValue)}>
+      <Text style={[styles.label, { color: theme.text }]}>Catégorie :</Text>
+      <Picker
+        selectedValue={category}
+        onValueChange={(itemValue) => setCategory(itemValue)}
+        style={[styles.picker, { color: theme.text }]}
+      >
         <Picker.Item label="Général" value="Général" />
         <Picker.Item label="Travail" value="Travail" />
         <Picker.Item label="Personnel" value="Personnel" />
@@ -38,13 +43,10 @@ export default function TaskInput({ addTask, theme }) {
 }
 
 const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1, borderColor: '#ddd', padding: 10, borderRadius: 5, marginBottom: 10, backgroundColor: '#fff',
-  },
-  addButton: {
-    backgroundColor: '#5cb85c', padding: 10, borderRadius: 5, alignItems: 'center', marginBottom: 10,
-  },
-  addButtonText: {
-    color: '#fff', fontWeight: 'bold',
-  },
+  container: { width: '90%', padding: 20, backgroundColor: '#fff', borderRadius: 10, alignSelf: 'center' },
+  label: { fontSize: 16, fontWeight: 'bold', marginBottom: 5 },
+  input: { width: '100%', padding: 10, borderWidth: 1, borderColor: '#ddd', borderRadius: 5, marginBottom: 10 },
+  picker: { width: '100%', marginBottom: 10 },
+  addButton: { padding: 15, borderRadius: 5, alignItems: 'center', width: '100%' },
+  addButtonText: { fontSize: 18, fontWeight: 'bold' },
 });
