@@ -57,12 +57,12 @@ Taskly/
 ```
 
 ## 📌 Technologies utilisées
-React Native (Expo)
-AsyncStorage (Stockage local des tâches et du thème)
-React Navigation (Gestion de la navigation)
-✨ Améliorations futures
-🔔 Notifications pour les tâches urgentes
-📅 Intégration d’un calendrier pour planifier les tâches
-🔄 Synchronisation cloud pour sauvegarder les tâches
+- React Native (Expo)
+- AsyncStorage (Stockage local des tâches et du thème)
+- React Navigation (Gestion de la navigation)
+- ✨ Améliorations futures
+- 🔔 Notifications pour les tâches urgentes
+- 📅 Intégration d’un calendrier pour planifier les tâches
+- 🔄 Synchronisation cloud pour sauvegarder les tâches
 
 🚀 Taskly est conçu pour améliorer la productivité de manière simple et efficace. Contribuez ou signalez des bugs sur le dépôt GitHub ! 🎉
