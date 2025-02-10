@@ -37,8 +37,9 @@ export default function HomeScreen({ navigation }) {
   };
 
   const addTask = (text, category) => {
-    const newTasks = [...tasks, { id: Date.now().toString(), text, category, completed: false }];
-    setTasks(newTasks);
+    const newTask = { id: Date.now().toString(), text, category, completed: false };
+    const sortedTasks = [newTask, ...tasks].sort((a, b) => (a.category === 'Urgent' ? -1 : 1));
+    setTasks(sortedTasks);
     setModalVisible(false);
   };
 
@@ -60,11 +61,13 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>  
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.text }]}>📋 To-Do List</Text>
-        <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
-          <Text style={[styles.themeButtonText, { color: theme.text }]}> {theme === lightTheme ? '🌙' : '☀️'} </Text>
-        </TouchableOpacity>
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: theme.text }]}>📋 Taskly</Text>
+          <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
+            <Text style={[styles.themeButtonText, { color: theme.text }]}> {theme === lightTheme ? '🌙' : '☀️'} </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {tasks.length === 0 ? (
@@ -111,19 +114,19 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' },
+  container: { flex: 1, padding: 20 },
+  headerContainer: { width: '100%', marginBottom: 20 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    marginBottom: 10,
   },
   title: { fontSize: 24, fontWeight: 'bold' },
   themeButton: { padding: 10, borderRadius: 10, backgroundColor: '#666' },
   themeButtonText: { fontSize: 18, fontWeight: 'bold' },
   categoryTitle: { fontSize: 20, fontWeight: 'bold', marginVertical: 10 },
-  emptyContainer: { justifyContent: 'center', alignItems: 'center' },
+  emptyContainer: { justifyContent: 'center', alignItems: 'center', marginTop: 50 },
   emptyText: { fontSize: 16, textAlign: 'center', marginTop: 10 },
   modalContainer: {
     flex: 1,
