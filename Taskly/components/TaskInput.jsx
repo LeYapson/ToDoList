@@ -3,12 +3,13 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-nativ
 import { Picker } from '@react-native-picker/picker';
 
 export default function TaskInput({ addTask, theme }) {
+  const [taskTitle, setTaskTitle] = useState('');
   const [task, setTask] = useState('');
   const [category, setCategory] = useState('Général');
 
   const handleAddTask = () => {
     if (task.trim() === '') return;
-    addTask(task, category);
+    addTask(taskTitle, task, category);
     setTask('');
   };
 
@@ -17,7 +18,16 @@ export default function TaskInput({ addTask, theme }) {
       <Text style={[styles.label, { color: theme.text }]}>Nouvelle tâche :</Text>
       <TextInput
         style={[styles.input, { color: theme.text }]}
-        placeholder="Entrez une tâche"
+        placeholder="Titre de la tâche"
+        placeholderTextColor={theme.text}
+        value={taskTitle}
+        onChangeText={setTaskTitle}
+      />
+
+      <Text style={[styles.label, { color: theme.text }]}>Description</Text>
+      <TextInput
+        style={[styles.input, { color: theme.text }]}
+        placeholder="Description de la tâche"
         placeholderTextColor={theme.text}
         value={task}
         onChangeText={setTask}

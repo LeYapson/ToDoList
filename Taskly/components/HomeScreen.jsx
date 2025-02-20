@@ -30,14 +30,18 @@ export default function HomeScreen({ navigation }) {
     }
   }, [tasks]);
 
+  const reloadTasks = () => {
+    loadTasks().then(setTasks);
+  };
+
   const toggleTheme = async () => {
     const newTheme = theme === lightTheme ? darkTheme : lightTheme;
     setTheme(newTheme);
     await AsyncStorage.setItem('theme', newTheme === darkTheme ? 'dark' : 'light');
   };
 
-  const addTask = (text, category) => {
-    const newTask = { id: Date.now().toString(), text, category, completed: false };
+  const addTask = (title, description, category) => {
+    const newTask = { id: Date.now().toString(), title, description, category, completed: false };
     const sortedTasks = [newTask, ...tasks].sort((a, b) => (a.category === 'Urgent' ? -1 : 1));
     setTasks(sortedTasks);
     setModalVisible(false);
@@ -51,16 +55,17 @@ export default function HomeScreen({ navigation }) {
     setTasks(tasks.filter(task => task.id !== id));
   };
 
-  const categorizedTasks = tasks.reduce((acc, task) => {
-    if (!task.completed) {
-      if (!acc[task.category]) acc[task.category] = [];
-      acc[task.category].push(task);
-    }
+  const pendingTasks = tasks.filter(task => !task.completed);
+  const completedTasks = tasks.filter(task => task.completed);
+
+  const categorizedTasks = pendingTasks.reduce((acc, task) => {
+    if (!acc[task.category]) acc[task.category] = [];
+    acc[task.category].push(task);
     return acc;
   }, {});
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>  
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: theme.text }]}>📋 Taskly</Text>
@@ -76,16 +81,32 @@ export default function HomeScreen({ navigation }) {
           <Text style={[styles.emptyText, { color: theme.text }]}>Ajoutez-en une avec le +</Text>
         </View>
       ) : (
-        <FlatList
-          data={Object.entries(categorizedTasks)}
-          keyExtractor={(item) => item[0]}
-          renderItem={({ item }) => (
-            <View>
-              <Text style={[styles.categoryTitle, { color: theme.text }]}>{item[0]}</Text>
-              <TaskList tasks={item[1]} toggleTask={toggleTask} deleteTask={deleteTask} theme={theme} />
-            </View>
-          )}
-        />
+        <>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>À faire</Text>
+          <FlatList
+            data={Object.entries(categorizedTasks)}
+            keyExtractor={(item) => item[0]}
+            renderItem={({ item }) => (
+              <View>
+                <Text style={[styles.categoryTitle, { color: theme.text }]}>{item[0]}</Text>
+                <TaskList tasks={item[1]} toggleTask={toggleTask} deleteTask={deleteTask} theme={theme} />
+              </View>
+            )}
+          />
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Terminé</Text>
+          <FlatList
+            data={completedTasks}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TaskItem
+                task={item}
+                toggleTask={toggleTask}
+                deleteTask={deleteTask}
+                theme={theme}
+              />
+            )}
+          />
+        </>
       )}
 
       <Modal
@@ -105,8 +126,8 @@ export default function HomeScreen({ navigation }) {
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity style={styles.statsButton} onPress={() => navigation.navigate('Stats', { tasks, theme })}>
+
+      <TouchableOpacity style={styles.statsButton} onPress={() => navigation.navigate('Stats', { tasks, theme, reloadTasks })}>
         <Text style={styles.statsButtonText}>≡</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -125,6 +146,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold' },
   themeButton: { padding: 10, borderRadius: 10, backgroundColor: '#666' },
   themeButtonText: { fontSize: 18, fontWeight: 'bold' },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', marginVertical: 10 },
   categoryTitle: { fontSize: 20, fontWeight: 'bold', marginVertical: 10 },
   emptyContainer: { justifyContent: 'center', alignItems: 'center', marginTop: 50 },
   emptyText: { fontSize: 16, textAlign: 'center', marginTop: 10 },

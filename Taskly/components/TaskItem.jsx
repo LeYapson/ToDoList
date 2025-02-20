@@ -10,10 +10,13 @@ export default function TaskItem({ task, toggleTask, deleteTask, theme }) {
       style={[styles.task, { backgroundColor: theme.taskBackground }]}
     >
       <TouchableOpacity onPress={() => toggleTask(task.id)}>
-        <Text style={[styles.taskText, task.completed && styles.completed, { color: theme.text }]}>
-          {task.text}
+        <Text style={[styles.taskTitle, { color: theme.text }]}>
+          {task.title}
         </Text>
-        <Text style={styles.categoryText}>📌 {task.category}</Text>
+        <Text style={[styles.taskText, task.completed && styles.completed, { color: theme.text }]}>
+          {task.description}
+        </Text>
+        <Text style={[styles.categoryText, { color: theme.text }]}>📌 {task.category}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => deleteTask(task.id)}>
         <Text style={[styles.deleteButton, { color: theme.text }]}>❌</Text>
@@ -36,6 +39,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
+  taskTitle: { fontSize: 18, fontWeight: 'bold' },
   taskText: { fontSize: 16 },
   categoryText: { fontSize: 12, color: 'gray' },
   completed: { textDecorationLine: 'line-through', color: 'gray' },

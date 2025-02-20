@@ -17,3 +17,11 @@ export const saveTasks = async (tasks) => {
     console.error('Erreur de sauvegarde des tâches', error);
   }
 };
+
+export const deleteAllTasks = async () => {
+  try {
+    await AsyncStorage.removeItem('tasks');
+  } catch (error) {
+    console.error('Erreur de suppression des tâches', error);
+  }
+}
