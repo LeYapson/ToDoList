@@ -44,16 +44,19 @@ npx expo start
 
 ```
 Taskly/
-│── src/
-│   ├── components/
-│   │   ├── TaskInput.jsx
-│   │   ├── TaskList.jsx
-│   │   ├── TaskItem.jsx
-│   │   ├── HomeScreen.jsx
-│   │   ├── StatsScreen.jsx
+│── .expo/
+│── assets/
+├── components/
+│   ├── TaskInput.jsx
+│   ├── TaskList.jsx
+│   ├── TaskItem.jsx
+│   ├── HomeScreen.jsx
+│   ├── StatsScreen.jsx
 │   ├── theme.js
+│   ├── Storage.js
 │── App.js
 │── package.json
+│── index.js
 ```
 
 ## 📌 Technologies utilisées
