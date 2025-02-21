@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TaskList from './TaskList';
 import TaskInput from './TaskInput';
+import TaskItem from './TaskItem';
 import { loadTasks, saveTasks } from './Storage';
 import { lightTheme, darkTheme } from './theme';
 
